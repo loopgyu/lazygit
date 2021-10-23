@@ -6,6 +6,7 @@ package oscommands
 import (
 	"bufio"
 	"bytes"
+	"io"
 	"strings"
 	"unicode/utf8"
 
@@ -19,7 +20,7 @@ import (
 // Output is a function that executes by every word that gets read by bufio
 // As return of output you need to give a string that will be written to stdin
 // NOTE: If the return data is empty it won't written anything to stdin
-func RunCommandWithOutputLiveWrapper(c *OSCommand, cmdObj ICmdObj, output func(string) string) error {
+func RunCommandWithOutputLiveWrapper(c *OSCommand, cmdObj ICmdObj, writer io.Writer, output func(string) string) error {
 	c.Log.WithField("command", cmdObj.ToString()).Info("RunCommand")
 	c.LogCommand(cmdObj.ToString(), true)
 	cmd := cmdObj.AddEnvVars("LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8").GetCmd()
@@ -28,6 +29,7 @@ func RunCommandWithOutputLiveWrapper(c *OSCommand, cmdObj ICmdObj, output func(s
 	cmd.Stderr = &stderr
 
 	ptmx, err := pty.Start(cmd)
+	// cmd.Stdout = io.MultiWriter(cmd.Stdout, writer)
 
 	if err != nil {
 		return err
@@ -37,6 +39,8 @@ func RunCommandWithOutputLiveWrapper(c *OSCommand, cmdObj ICmdObj, output func(s
 		scanner := bufio.NewScanner(ptmx)
 		scanner.Split(scanWordsWithNewLines)
 		for scanner.Scan() {
+			panic([]byte(output(scanner.Text())))
+			writer.Write([]byte(output(scanner.Text())))
 			toOutput := strings.Trim(scanner.Text(), " ")
 			_, _ = ptmx.WriteString(output(toOutput))
 		}

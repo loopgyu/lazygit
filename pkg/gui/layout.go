@@ -129,6 +129,8 @@ func (gui *Gui) createAllViews() error {
 		return err
 	}
 
+	gui.GitCommand.CmdWriter = gui.Views.Extras
+
 	return nil
 }
 

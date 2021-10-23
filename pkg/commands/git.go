@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -40,6 +41,7 @@ type GitCommand struct {
 
 	// Push to current determines whether the user has configured to push to the remote branch of the same name as the current or not
 	PushToCurrent bool
+	CmdWriter     io.Writer
 }
 
 // NewGitCommand it runs git commands
@@ -49,6 +51,7 @@ func NewGitCommand(
 	tr *i18n.TranslationSet,
 	config config.AppConfigurer,
 	gitConfig git_config.IGitConfig,
+	cmdWriter io.Writer,
 ) (*GitCommand, error) {
 	var repo *gogit.Repository
 
@@ -77,6 +80,7 @@ func NewGitCommand(
 		DotGitDir:     dotGitDir,
 		PushToCurrent: pushToCurrent,
 		GitConfig:     gitConfig,
+		CmdWriter:     cmdWriter,
 	}
 
 	gitCommand.PatchManager = patch.NewPatchManager(log, gitCommand.ApplyPatch, gitCommand.ShowFileDiff)

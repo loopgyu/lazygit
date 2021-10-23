@@ -73,7 +73,7 @@ func (gui *Gui) dispatchSwitchToRepo(path string, reuse bool) error {
 		return err
 	}
 
-	newGitCommand, err := commands.NewGitCommand(gui.Log, gui.OSCommand, gui.Tr, gui.Config, git_config.NewStdCachedGitConfig(gui.Log))
+	newGitCommand, err := commands.NewGitCommand(gui.Log, gui.OSCommand, gui.Tr, gui.Config, git_config.NewStdCachedGitConfig(gui.Log), gui.Views.Extras)
 	if err != nil {
 		return err
 	}
